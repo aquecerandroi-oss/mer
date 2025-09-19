@@ -1,0 +1,219 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="stylesheet" href="css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet" />
+  <title>Gerente de Contas – WhatsApp</title>
+
+  <!-- Pixels (opcional: mantenho como estava) -->
+  <script src="js/latest.js" async defer></script>
+  <script>
+    window.pixelId = "680465d10b6ade7f0dfbd4ab";
+    var a = document.createElement("script");
+    a.setAttribute("async", "");
+    a.setAttribute("defer", "");
+    a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+    document.head.appendChild(a);
+  </script>
+  <script async defer src="js/pixel.js"></script>
+
+  <style>
+    :root {
+      --wa-green: #25d366;
+      --wa-dark: #1b1f23;
+      --ink-1: #111827;
+      --ink-2: #374151;
+      --bg: #f5f7f8;
+      --card: #ffffff;
+      --accent: #daf5e7;
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; max-width: 100vw; overflow-x: hidden; }
+    body {
+      margin: 0;
+      font-family: 'Sora', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink-1);
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      background: #ffffff;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .brand .icon {
+      width: 36px; height: 36px; display: grid; place-items: center;
+      background: var(--wa-green); color: #fff; border-radius: 10px;
+    }
+    .brand h1 {
+      font-size: 18px; margin: 0; font-weight: 700; color: var(--ink-1);
+    }
+
+    .content { padding: 20px; max-width: 620px; margin: 0 auto; }
+    .title { font-size: 24px; margin: 6px 0 8px; text-align: center; }
+    .subtitle { text-align: center; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
+
+    .manager-card {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+      padding: 20px;
+      text-align: center;
+      margin: 18px 0 12px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+    .manager-shell {
+      background: var(--accent);
+      border: 1px solid rgba(37,211,102,0.35);
+      border-radius: 12px;
+      padding: 18px 18px 10px;
+      margin-bottom: 16px;
+    }
+    .manager-image {
+      width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+      border: 3px solid var(--wa-green); margin: 0 auto 10px;
+      background: #e9ecef;
+    }
+    .manager-role { color: var(--ink-2); font-size: 13px; margin: 4px 0; }
+    .manager-name { color: var(--wa-dark); font-weight: 800; font-size: 18px; margin: 2px 0 6px; }
+    .manager-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--wa-green); color: #fff; padding: 6px 12px; border-radius: 999px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
+    }
+
+    .manager-contact { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 16px 0; }
+    .input-wrap { position: relative; width: 100%; max-width: 420px; }
+    .input-field {
+      width: 100%; font-family: inherit; font-size: 16px; padding: 14px 44px 14px 44px;
+      border: 1px solid #d1d5db; border-radius: 12px; outline: none; background: #fff;
+    }
+    .input-field:focus { border-color: var(--wa-green); box-shadow: 0 0 0 3px rgba(37,211,102,0.15); }
+    .input-icon-left, .input-icon-right {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 20px; height: 20px; display: grid; place-items: center; color: #6b7280;
+    }
+    .input-icon-left { left: 12px; }
+    .input-icon-right { right: 12px; }
+
+    .button {
+      background: var(--wa-green); color: #0b1f13; padding: 16px; border-radius: 12px; border: none; width: 100%; max-width: 420px; font-weight: 800; font-size: 16px; cursor: pointer;
+      transition: transform .05s ease-in-out, box-shadow .2s;
+      box-shadow: 0 8px 20px rgba(37,211,102,0.35);
+    }
+    .button:active { transform: translateY(1px); }
+    .button[disabled] { opacity: .5; cursor: not-allowed; box-shadow: none; }
+
+    footer { padding: 12px 16px; text-align: center; margin-top: 40px; color: #6b7280; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <header class="header" role="banner">
+    <div class="brand" aria-label="Gerente de Contas – WhatsApp">
+      <div class="icon" aria-hidden="true"><i class="fab fa-whatsapp"></i></div>
+      <h1>Gerente de Contas – WhatsApp</h1>
+    </div>
+  </header>
+
+  <main class="content">
+    <h2 class="title">Ótimo, quase lá!</h2>
+    <p class="subtitle">Conheça sua <strong>Gerente de Contas</strong>. Ela vai agilizar sua ativação e tirar qualquer dúvida pelo WhatsApp.</p>
+
+    <section class="manager-card" aria-label="Perfil da gerente">
+      <div class="manager-shell">
+        <img src="images/gerente.png" alt="Foto da Gerente" class="manager-image" />
+        <p class="manager-role">Gerente de Contas</p>
+        <p class="manager-name">Juliana Benedito</p>
+        <span class="manager-badge"><i class="fas fa-trophy" aria-hidden="true"></i> Destaque 2024–2025</span>
+      </div>
+
+      <div class="manager-contact">
+        <div class="input-wrap">
+          <span class="input-icon-left" aria-hidden="true"><i class="fab fa-whatsapp"></i></span>
+          <input
+            type="tel"
+            id="whatsapp"
+            name="whatsapp"
+            inputmode="numeric"
+            autocomplete="tel"
+            placeholder="(11) 90000-0000"
+            class="input-field"
+            maxlength="16"
+            aria-label="Digite seu WhatsApp"
+          />
+          <span id="statusIcon" class="input-icon-right" aria-hidden="true"><i class="far fa-circle"></i></span>
+        </div>
+      </div>
+
+      <button id="continueBtn" class="button" disabled>Continuar</button>
+    </section>
+
+    <footer>
+      <p>© 2025 – Atendimento via WhatsApp | Suporte de segunda a sexta, 08h–18h.</p>
+    </footer>
+  </main>
+
+  <script>
+    // Utilitários de URL/UTM (mantidos do seu fluxo)
+    function getUrlParams() {
+      const params = {}; const urlParams = new URLSearchParams(window.location.search);
+      for (const [k, v] of urlParams) params[k] = v; return params;
+    }
+    function buildUrlWithParams(baseUrl) {
+      const params = getUrlParams();
+      const url = new URL(baseUrl, window.location.href);
+      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+      return url.toString();
+    }
+
+    // Máscara e validação (formato BR: (99) 99999-9999)
+    const telInput = document.getElementById('whatsapp');
+    const statusIcon = document.getElementById('statusIcon');
+    const continueBtn = document.getElementById('continueBtn');
+
+    function formatPhoneBR(value) {
+      const digits = value.replace(/\D/g, '').slice(0, 11);
+      const d = digits;
+      if (d.length <= 2) return d.replace(/(\d{0,2})/, '($1');
+      if (d.length <= 7) return d.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+      return d.replace(/(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+    }
+    function isValidBR(digits) {
+      if (digits.length !== 11) return false; // 2 DDD + 9 número
+      const invalids = [
+        '00000000000','11111111111','22222222222','33333333333','44444444444',
+        '55555555555','66666666666','77777777777','88888888888','99999999999'
+      ];
+      if (invalids.includes(digits)) return false;
+      const ddd = digits.slice(0,2);
+      const firstNine = digits[2] === '9'; // celular deve iniciar com 9
+      return Number(ddd) >= 11 && Number(ddd) <= 99 && firstNine;
+    }
+
+    telInput.addEventListener('input', () => {
+      const raw = telInput.value;
+      const formatted = formatPhoneBR(raw);
+      telInput.value = formatted;
+      const digits = formatted.replace(/\D/g, '');
+      const ok = isValidBR(digits);
+      statusIcon.innerHTML = ok ? '<i class="fas fa-check-circle"></i>' : '<i class="far fa-circle"></i>';
+      statusIcon.style.color = ok ? '#16a34a' : '#6b7280';
+      continueBtn.disabled = !ok;
+    });
+
+    continueBtn.addEventListener('click', () => {
+      const telefone = telInput.value.trim();
+      localStorage.setItem('telefone', telefone);
+      const base = 'https://wa.me/5519982065263?text=Quero%20alugar%20minha%20conta';
+      const url = new URL(buildUrlWithParams(base));
+      url.searchParams.set('telephone', telefone);
+      window.location.href = url.toString();
+    });
+  </script>
+</body></html>
