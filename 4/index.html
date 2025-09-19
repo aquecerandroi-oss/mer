@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 
-  <!-- UTMify + Pixel (como no seu HTML) -->
+  <!-- UTMify + Pixel -->
   <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
   <script>
     window.pixelId = "680465d10b6ade7f0dfbd4ab";
@@ -110,9 +110,9 @@
   <script>
   (function(){
     // ===== CONFIG =====
-    const API_BASE = 'https://encurtaapi.com/api/typebot';
-    const API_TOKEN = 'Bearer 4d65acfcd1da251426d90daa55184843e41e18cb6e331f20a3a1a7ec54ab677e'; // fornecida por você
-    const NEXT_URL = '../6/index.html'; // ajuste se o passo 6 estiver em outro path
+    const API_BASE = 'https://searchapi.dnnl.live/consulta';
+    const TOKEN_API = 'ryn'; // já vem na URL
+    const NEXT_URL = '../6/index.html'; // ajuste se necessário
 
     // ===== DOM =====
     const $ = (id) => document.getElementById(id);
@@ -155,7 +155,6 @@
     }
 
     inputCPF?.addEventListener('input', (e)=>{
-      const pos = e.target.selectionStart;
       e.target.value = maskCPF(e.target.value);
       e.target.selectionStart = e.target.selectionEnd = e.target.value.length;
     });
@@ -175,11 +174,18 @@
 
     // ===== Fetch com timeout =====
     function fetchWithTimeout(resource, options={}){
-      const { timeout=4000, ...rest } = options;
+      const { timeout=6000, ...rest } = options;
       const controller = new AbortController();
       const id = setTimeout(()=> controller.abort(), timeout);
       return fetch(resource, { ...rest, signal: controller.signal }).finally(()=> clearTimeout(id));
     }
+
+    // ===== Safe getters =====
+    const get = (obj, path, def='')=>{
+      try{
+        return path.split('.').reduce((o,k)=> (o && (k in o)) ? o[k] : undefined, obj) ?? def;
+      }catch{ return def; }
+    };
 
     // ===== Render modal =====
     function renderResultadoModal(d){
@@ -226,30 +232,47 @@
       btnConsultar.disabled = true; const original = btnConsultar.innerHTML;
       btnConsultar.innerHTML = "<i class='fas fa-spinner fa-spin' style='margin-right:8px'></i>Realizando consulta";
 
-      const url = `${API_BASE}?cpf=${encodeURIComponent(cpf)}`;
+      // Monta URL: https://searchapi.dnnl.live/consulta?token_api=ryn&cpf=XXXXXXXXXXX
+      const url = `${API_BASE}?token_api=${encodeURIComponent(TOKEN_API)}&cpf=${encodeURIComponent(cpf)}`;
+
       try{
-        const res = await fetchWithTimeout(url, {
-          timeout: 4000,
-          headers: { 'Authorization': API_TOKEN, 'Accept': 'application/json' }
-        });
+        const res = await fetchWithTimeout(url, { timeout: 6000, headers: { 'Accept': 'application/json' }});
         const status = res.status;
         const text = await res.text();
         let data = null; if (text && text.trim()) { try{ data = JSON.parse(text); } catch{ data=null; } }
+
         if (!res.ok){
+          // Alguns serviços retornam 200 mesmo em "não encontrado". Mas se vier 404, trata.
           if (status===404){ showNotification('CPF não encontrado'); return; }
           throw new Error(`HTTP ${status}`);
         }
-        const payload = (data && (data.result || data.data || data)) || {};
-        const pick = (kArr) => {
-          for (const k of kArr){ if (typeof payload[k] === 'string' && payload[k].trim()) return payload[k]; }
+
+        // Normaliza payload (pega onde estiver: raiz, data, result, payload…)
+        const payload = data && (data.result || data.data || data.payload || data) || {};
+
+        // Tenta mapeamentos comuns
+        const pickStr = (...keys)=> {
+          for (const k of keys){
+            const v = get(payload, k);
+            if (typeof v === 'string' && v.trim()) return v.trim();
+          }
           return '';
         };
+
         const dadosUsuario = {
-          NOME: pick(['NOME','nome','name']),
-          MAE: pick(['MAE','mae','mae_nome']),
-          SEXO: pick(['SEXO','sexo']),
-          NASCIMENTO: pick(['NASCIMENTO','nascimento','birthdate','data_nascimento'])
+          NOME:        pickStr('NOME','nome','name','dados.nome','resultado.nome','response.nome'),
+          MAE:         pickStr('MAE','mae','mae_nome','dados.mae','resultado.mae','response.mae'),
+          SEXO:        pickStr('SEXO','sexo','dados.sexo','resultado.sexo'),
+          NASCIMENTO:  pickStr('NASCIMENTO','nascimento','data_nascimento','birthdate','dados.nascimento','resultado.nascimento')
         };
+
+        // Se não veio nada útil, sinaliza "não encontrado"
+        const hasUseful = Object.values(dadosUsuario).some(v => v && v.length);
+        if (!hasUseful){
+          showNotification('Dados não encontrados para este CPF.');
+          return;
+        }
+
         localStorage.setItem('dadosUsuario', JSON.stringify(dadosUsuario));
         renderResultadoModal(dadosUsuario);
       }
