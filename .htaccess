@@ -1,5 +1,0 @@
-RewriteEngine On
-
-RewriteCond %{HTTP_HOST} ^libereidigita\.it\.com$ [NC]
-
-RewriteRule ^$ https://libereidigita.it.com/ml/[L,R=301]
