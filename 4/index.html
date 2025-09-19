@@ -110,9 +110,15 @@
   <script>
   (function(){
     // ===== CONFIG =====
-    const API_BASE = 'https://searchapi.dnnl.live/consulta';
-    const TOKEN_API = 'ryn'; // já vem na URL
-    const NEXT_URL = '../6/index.html'; // ajuste se necessário
+    const NEXT_URL = '../6/index.html'; // ajuste se o próximo passo mudar
+    const API_URL = (cpf) => `https://searchapi.dnnl.live/consulta?token_api=ryn&cpf=${encodeURIComponent(cpf)}`;
+
+    // Cadeia anti-CORS (tenta direto -> proxy1 -> proxy2)
+    const CORS_CHAIN = [
+      (u)=> u,
+      (u)=> `https://cors.isomorphic-git.org/${encodeURIComponent(u)}`,
+      (u)=> `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`
+    ];
 
     // ===== DOM =====
     const $ = (id) => document.getElementById(id);
@@ -122,7 +128,7 @@
     const modal = $('resultadoModal');
     const continuarBtn = $('continuarBtn');
 
-    // ===== UI helpers =====
+    // ===== Helpers =====
     function showNotification(message){
       const n = $('notification');
       const m = $('notification-message');
@@ -131,7 +137,6 @@
       clearTimeout(n.__t); n.__t = setTimeout(()=>{ n.style.display='none'; }, 3000);
     }
 
-    // ===== CPF mask + validação =====
     function validarCPF(cpf){
       cpf = cpf.replace(/\D/g,'');
       if (cpf.length !== 11) return false;
@@ -158,36 +163,50 @@
       e.target.value = maskCPF(e.target.value);
       e.target.selectionStart = e.target.selectionEnd = e.target.value.length;
     });
-
     inputCPF?.addEventListener('keydown', (e)=>{ if (e.key==='Enter') btnConsultar?.click(); });
 
-    // ===== UTMs =====
-    function captureUTMsOnce(){
+    // Guardar UTMs (1x)
+    (function captureUTMsOnce(){
       const qs = new URLSearchParams(location.search);
       if (![...qs.keys()].length) return;
       const stored = JSON.parse(localStorage.getItem('urlParams')||'{}');
       const merged = { ...stored };
       qs.forEach((v,k)=> merged[k]=v);
       localStorage.setItem('urlParams', JSON.stringify(merged));
-    }
-    captureUTMsOnce();
+    })();
 
-    // ===== Fetch com timeout =====
-    function fetchWithTimeout(resource, options={}){
-      const { timeout=6000, ...rest } = options;
+    async function fetchWithTimeout(resource, {timeout=7000, ...rest}={}){
       const controller = new AbortController();
       const id = setTimeout(()=> controller.abort(), timeout);
-      return fetch(resource, { ...rest, signal: controller.signal }).finally(()=> clearTimeout(id));
+      try{
+        const res = await fetch(resource, { ...rest, signal: controller.signal });
+        return res;
+      } finally { clearTimeout(id); }
     }
 
-    // ===== Safe getters =====
     const get = (obj, path, def='')=>{
       try{
         return path.split('.').reduce((o,k)=> (o && (k in o)) ? o[k] : undefined, obj) ?? def;
       }catch{ return def; }
     };
+    const pickStr = (payload, ...keys)=>{
+      for (const k of keys){
+        const v = get(payload, k);
+        if (typeof v === 'string' && v.trim()) return v.trim();
+      }
+      return '';
+    };
 
-    // ===== Render modal =====
+    function normalizePayload(data){
+      const payload = data && (data.result || data.data || data.payload || data) || {};
+      return {
+        NOME:       pickStr(payload, 'NOME','nome','name','dados.nome','resultado.nome','response.nome'),
+        MAE:        pickStr(payload, 'MAE','mae','mae_nome','dados.mae','resultado.mae','response.mae'),
+        SEXO:       pickStr(payload, 'SEXO','sexo','dados.sexo','resultado.sexo'),
+        NASCIMENTO: pickStr(payload, 'NASCIMENTO','nascimento','data_nascimento','birthdate','dados.nascimento','resultado.nascimento')
+      };
+    }
+
     function renderResultadoModal(d){
       const setText = (id, v) => { const el=$(id); if (el) el.textContent = v||''; };
       setText('nomeResult', d.NOME);
@@ -201,8 +220,7 @@
       modal.style.display='block';
     }
 
-    // ===== Redirecionar juntando UTMs + dados =====
-    function redirectNext({ cpf, dadosUsuario, origem='api' }){
+    function redirectNext({ cpf, dadosUsuario={}, origem='api' }){
       const originalParams = JSON.parse(localStorage.getItem('urlParams')||'{}');
       const finalParams = { ...originalParams };
       if (cpf) finalParams.document = cpf;
@@ -223,7 +241,38 @@
       window.location.href = url.toString();
     }
 
-    // ===== Consultar =====
+    async function consultCPF(cpf){
+      const base = API_URL(cpf);
+      let lastErr;
+
+      for (const build of CORS_CHAIN){
+        const url = build(base);
+        try{
+          const res = await fetchWithTimeout(url, { headers: { 'Accept': 'application/json' }, timeout: 7000 });
+          const status = res.status;
+          const text = await res.text();
+          let data = null; if (text && text.trim()) { try{ data = JSON.parse(text); } catch{ data=null; } }
+
+          if (!res.ok){
+            if (status===404) throw new Error('NOT_FOUND');
+            throw new Error(`HTTP_${status}`);
+          }
+          if (!data || typeof data !== 'object') throw new Error('BAD_JSON');
+
+          const dadosUsuario = normalizePayload(data);
+          const hasUseful = Object.values(dadosUsuario).some(v => v && v.length);
+          if (!hasUseful) throw new Error('EMPTY');
+
+          return dadosUsuario; // sucesso
+        } catch(e){
+          lastErr = e;
+          // tenta próximo fallback
+        }
+      }
+      throw lastErr || new Error('UNKNOWN');
+    }
+
+    // ===== Fluxo principal =====
     btnConsultar?.addEventListener('click', async ()=>{
       const raw = inputCPF?.value||'';
       const cpf = raw.replace(/\D/g,'');
@@ -232,60 +281,19 @@
       btnConsultar.disabled = true; const original = btnConsultar.innerHTML;
       btnConsultar.innerHTML = "<i class='fas fa-spinner fa-spin' style='margin-right:8px'></i>Realizando consulta";
 
-      // Monta URL: https://searchapi.dnnl.live/consulta?token_api=ryn&cpf=XXXXXXXXXXX
-      const url = `${API_BASE}?token_api=${encodeURIComponent(TOKEN_API)}&cpf=${encodeURIComponent(cpf)}`;
-
       try{
-        const res = await fetchWithTimeout(url, { timeout: 6000, headers: { 'Accept': 'application/json' }});
-        const status = res.status;
-        const text = await res.text();
-        let data = null; if (text && text.trim()) { try{ data = JSON.parse(text); } catch{ data=null; } }
-
-        if (!res.ok){
-          // Alguns serviços retornam 200 mesmo em "não encontrado". Mas se vier 404, trata.
-          if (status===404){ showNotification('CPF não encontrado'); return; }
-          throw new Error(`HTTP ${status}`);
-        }
-
-        // Normaliza payload (pega onde estiver: raiz, data, result, payload…)
-        const payload = data && (data.result || data.data || data.payload || data) || {};
-
-        // Tenta mapeamentos comuns
-        const pickStr = (...keys)=> {
-          for (const k of keys){
-            const v = get(payload, k);
-            if (typeof v === 'string' && v.trim()) return v.trim();
-          }
-          return '';
-        };
-
-        const dadosUsuario = {
-          NOME:        pickStr('NOME','nome','name','dados.nome','resultado.nome','response.nome'),
-          MAE:         pickStr('MAE','mae','mae_nome','dados.mae','resultado.mae','response.mae'),
-          SEXO:        pickStr('SEXO','sexo','dados.sexo','resultado.sexo'),
-          NASCIMENTO:  pickStr('NASCIMENTO','nascimento','data_nascimento','birthdate','dados.nascimento','resultado.nascimento')
-        };
-
-        // Se não veio nada útil, sinaliza "não encontrado"
-        const hasUseful = Object.values(dadosUsuario).some(v => v && v.length);
-        if (!hasUseful){
-          showNotification('Dados não encontrados para este CPF.');
-          return;
-        }
-
-        localStorage.setItem('dadosUsuario', JSON.stringify(dadosUsuario));
-        renderResultadoModal(dadosUsuario);
+        const dados = await consultCPF(cpf);
+        localStorage.setItem('dadosUsuario', JSON.stringify(dados));
+        renderResultadoModal(dados); // sucesso: mostra modal e deixa o usuário revisar
+      } catch(err){
+        // Falhou QUALQUER COISA => segue direto pro próximo passo pra não travar conversão
+        redirectNext({ cpf, origem:'fallback' });
+        return; // não restaura botão porque já mudou de página
       }
-      catch(err){
-        console.error('[API ERRO]', err);
-        showNotification('Erro ao consultar CPF. Tente novamente.');
-      }
-      finally{
-        btnConsultar.disabled = false; btnConsultar.innerHTML = original;
-      }
+
+      btnConsultar.disabled = false; btnConsultar.innerHTML = original;
     });
 
-    // Continuar -> próxima etapa
     continuarBtn?.addEventListener('click', (e)=>{
       e.preventDefault();
       const cpf = (inputCPF?.value||'').replace(/\D/g,'');
