@@ -23,89 +23,91 @@
     :root{
       --ml-yellow:#fff159;
       --ml-blue:#3483fa;
-      --text:#2b2b2b;
+      --ml-blue-dark:#2b6fdd;
+      --ink:#1f2230;
+      --ink-weak:#444;
+      --white:#ffffff;
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
-      margin:0;
-      font-family:'Sora',sans-serif;
-      background:var(--ml-yellow);
-      color:#333;
+      margin:0; font-family:'Sora',sans-serif; color:var(--ink);
+      background:
+        radial-gradient(60rem 60rem at -10% -20%, rgba(255,255,255,.6), rgba(255,255,255,0) 60%),
+        radial-gradient(40rem 40rem at 120% -10%, rgba(255,255,255,.5), rgba(255,255,255,0) 55%),
+        var(--ml-yellow);
       text-align:center;
     }
 
     /* ===== Header / Logo tipográfico ===== */
     .header{
-      position:sticky; top:0; z-index:10;
+      position:sticky; top:0; z-index:20;
       display:flex; align-items:center; justify-content:center;
-      padding:10px 12px;
-      background:var(--ml-yellow);
+      padding:10px 14px;
+      background:linear-gradient(180deg, #fff36b 0%, var(--ml-yellow) 100%);
       border-bottom:1.5px solid #e6d950;
+      transition:box-shadow .25s ease;
     }
+    .header.is-scrolled{ box-shadow:0 8px 24px rgba(0,0,0,.08) }
+
     .brand-logo{
-      display:inline-flex; align-items:center; gap:.45rem;
-      font-weight:800; letter-spacing:.3px;
-      color:var(--text); text-decoration:none;
-      user-select:none;
-      transform:translateZ(0);
+      display:inline-flex; align-items:center; gap:.55rem;
+      font-weight:800; letter-spacing:.3px; text-decoration:none; user-select:none;
+      color:var(--ink);
     }
-    .brand-logo .word-mercado{ color:var(--text) }
+    .brand-logo .word-mercado{ color:var(--ink) }
     .brand-logo .word-livre{ color:var(--ml-blue) }
     .brand-logo .pill-bank{
-      background:var(--ml-blue); color:#fff;
-      padding:4px 10px; border-radius:999px;
-      font-weight:700; font-size:13px; letter-spacing:.3px;
-      box-shadow:0 2px 6px rgba(0,0,0,.12);
+      background:var(--ml-blue); color:#fff; padding:4px 12px;
+      border-radius:999px; font-weight:800; font-size:12.5px; letter-spacing:.35px;
+      box-shadow:0 2px 8px rgba(52,131,250,.35);
       transform:translateY(-1px);
     }
     .brand-logo .underline{ position:relative; display:inline-block }
     .brand-logo .underline::after{
-      content:""; position:absolute; left:4px; right:4px; bottom:-2px; height:3px;
-      background:linear-gradient(90deg, rgba(52,131,250,.0), rgba(52,131,250,.9), rgba(52,131,250,.0));
+      content:""; position:absolute; left:6px; right:6px; bottom:-3px; height:3px;
+      background:linear-gradient(90deg, rgba(52,131,250,0), rgba(52,131,250,.9), rgba(52,131,250,0));
       border-radius:2px; filter:blur(.2px);
     }
 
-    .content{ padding:20px }
-    h1{ font-size:20px; margin-bottom:10px }
+    /* ===== Layout ===== */
+    .container{ max-width:1060px; margin:0 auto; padding:0 18px }
+    .content{ padding:24px 0 8px }
 
+    /* ===== CTA buttons ===== */
     .button{
-      background:var(--ml-blue); color:#fff;
-      padding:20px 20px;
-      border-radius:10px;
-      text-decoration:none;
-      font-weight:700; font-size:18px;
-      display:block; margin:20px auto;
-      border:none; cursor:pointer;
-      box-shadow:0 4px 8px rgba(0,0,0,.2);
-      transition:.3s; max-width:350px;
-      position:relative; animation:pulse 2s infinite;
-      margin-top:30px;
+      background:linear-gradient(180deg, var(--ml-blue), var(--ml-blue-dark));
+      color:var(--white); padding:18px 22px; border-radius:12px;
+      text-decoration:none; font-weight:800; font-size:18px; letter-spacing:.2px;
+      display:block; margin:22px auto; border:none; cursor:pointer;
+      box-shadow:0 8px 22px rgba(52,131,250,.35);
+      transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      max-width:360px; position:relative; isolation:isolate;
     }
-    @keyframes pulse{
-      0%{box-shadow:0 0 0 0 rgba(52,131,250,.7)}
-      70%{box-shadow:0 0 0 10px rgba(52,131,250,0)}
-      100%{box-shadow:0 0 0 0 rgba(52,131,250,0)}
+    .button::after{ /* brilho leve */
+      content:""; position:absolute; inset:0; border-radius:12px;
+      background:linear-gradient( to bottom right, rgba(255,255,255,.16), rgba(255,255,255,0) 60% );
+      pointer-events:none;
     }
-    .button:hover{ background:#2968c8 }
+    .button:hover{ transform:translateY(-1px); box-shadow:0 12px 26px rgba(52,131,250,.4) }
+    .button:active{ transform:translateY(0); filter:saturate(1.05) }
+    .button:focus-visible{ outline:3px solid #0f62fe; outline-offset:3px }
 
-    .benefits-section{
-      background:#dbd7af; padding:20px; border-radius:10px;
-      margin:20px auto; max-width:300px
+    /* ===== Badge topo ===== */
+    .top-badge{
+      margin: 18px auto 0; display:flex; align-items:center; justify-content:center;
+      column-gap:8px; width:fit-content; padding:10px 14px; border-radius:16px;
+      background:rgba(174,159,0,.14); border:1.5px solid #e6d950;
+      color:#000; font-weight:700; font-size:14px;
     }
-    .benefit-item{
-      background:#fff; color:#333; padding:10px; border-radius:5px; margin-bottom:10px;
-      box-shadow:0 2px 4px rgba(0,0,0,.1);
-      display:flex; align-items:center; justify-content:center
-    }
-    .benefit-item h3{ color:var(--ml-blue); margin:0; font-size:14px }
-    .benefit-item i{ margin-right:5px }
 
     /* ===== Hero sem imagem (mock do app) ===== */
-    .hero{ margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:14px }
+    .hero{ margin:18px 0 6px }
+    .hero .wrap{ display:flex; flex-direction:column; align-items:center; gap:14px }
     .phone{
-      width:260px; height:520px; border-radius:32px; padding:12px;
+      width:min(280px, 72vw); height:540px; border-radius:32px; padding:12px;
       background:#0f1115; border:6px solid #1b1f27;
-      box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+      box-shadow:0 18px 38px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
       position:relative;
     }
     .phone:before, .phone:after{
@@ -120,44 +122,75 @@
     }
     .statusbar{
       display:flex; justify-content:space-between; align-items:center;
-      padding:10px 12px; font-size:12px; color:#3b3b3b; font-weight:600;
+      padding:10px 12px; font-size:12px; color:#3b3b3b; font-weight:700;
     }
     .dots{ display:flex; gap:4px }
     .dot{ width:6px; height:6px; border-radius:50%; background:#c9d2e8 }
+
     .app-card{
       margin:12px; background:#fff; border:1px solid #e7ecfb; border-radius:16px; padding:14px;
-      box-shadow:0 6px 16px rgba(23,61,185,.08);
+      box-shadow: 0 10px 20px rgba(23,61,185,.08);
+      animation:cardIn .5s ease;
     }
+    @keyframes cardIn{ from{ transform:translateY(6px); opacity:.0 } to{ transform:none; opacity:1 } }
+
     .app-head{ display:flex; align-items:center; justify-content:space-between }
-    .brand{ display:flex; align-items:center; gap:8px; font-weight:800 }
+    .brand{ display:flex; align-items:center; gap:8px; font-weight:900; font-size:15px }
     .brand .b1{ color:#2b2b2b }
     .brand .b2{ color:var(--ml-blue) }
     .badge{
-      background:var(--ml-blue); color:#fff; font-size:11px; font-weight:700;
+      background:var(--ml-blue); color:#fff; font-size:11px; font-weight:800;
       padding:4px 8px; border-radius:999px;
     }
     .limit{
       margin-top:10px; background:var(--ml-yellow);
-      border:1px dashed #e2ca00; color:#2b2b2b; font-weight:700; font-size:14px;
+      border:1px dashed #e2ca00; color:#2b2b2b; font-weight:800; font-size:14px;
       padding:10px; border-radius:12px;
     }
     .feature{ margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px }
     .feature .item{
       background:#f7f9ff; border:1px solid #e7ecfb; border-radius:12px;
-      padding:10px; font-size:12px; color:#294372; font-weight:700;
+      padding:10px; font-size:12px; color:#294372; font-weight:800;
     }
+
     .cta{
       position:absolute; left:12px; right:12px; bottom:14px;
-      background:var(--ml-blue); color:#fff; text-align:center; font-weight:800;
-      padding:12px; border-radius:14px; box-shadow:0 8px 18px rgba(52,131,250,.25);
+      background:linear-gradient(180deg, var(--ml-blue), var(--ml-blue-dark)); color:#fff;
+      text-align:center; font-weight:900; letter-spacing:.2px;
+      padding:12px; border-radius:14px; box-shadow: 0 14px 24px rgba(52,131,250,.3);
     }
-    .cta small{ display:block; font-weight:600; opacity:.9 }
-    .hero-note{ color:#333; font-size:14px; max-width:520px; padding:0 12px }
+    .cta small{ display:block; font-weight:700; opacity:.9 }
+
+    .hero-note{ color:var(--ink-weak); font-size:14px; max-width:520px; padding:0 12px; margin:2px auto 0 }
+
+    /* ===== Benefit cards com “borda glow” ===== */
+    .benefits-section{ background:rgba(174,159,0,.14); padding:22px; border-radius:14px; margin:24px auto; max-width:340px }
+    .benefit-item{
+      position:relative; overflow:hidden;
+      background:#fff; color:#333; padding:12px; border-radius:10px; margin-bottom:12px;
+      border:1px solid #e9eefc;
+    }
+    .benefit-item::before{
+      content:""; position:absolute; inset:-1px; border-radius:12px;
+      background:linear-gradient(90deg, rgba(52,131,250,.22), rgba(255,255,255,0) 40%, rgba(52,131,250,.22));
+      filter:blur(10px); opacity:.7; pointer-events:none;
+    }
+    .benefit-item h3{ color:var(--ml-blue); margin:0; font-size:14px; font-weight:900 }
+    .benefit-item i{ margin-right:6px }
+
+    /* ===== Section titles ===== */
+    .section-title{ font-size:24px; color:#333; margin:34px 0 22px }
+
+    /* ===== Motion safe ===== */
+    @media (prefers-reduced-motion: reduce){
+      .button, .cta{ animation:none }
+      .app-card{ animation:none }
+    }
   </style>
 </head>
 <body>
-  <!-- Logo tipográfico -->
-  <header class="header" role="banner">
+  <!-- Header -->
+  <header class="header" role="banner" id="site-header">
     <a class="brand-logo" aria-label="Mercado Livre Bank" href="#">
       <span class="underline">
         <span class="word-mercado">Mercado</span>
@@ -167,152 +200,121 @@
     </a>
   </header>
 
-  <div class="content">
-    <div style="margin-top:30px;background-color:rgba(174,159,0,.15);color:#FFE600;padding:15px 5px;border-radius:20px;display:flex;align-items:center;justify-content:center;max-width:300px;margin:0 auto;">
-      <p style="margin:0;font-size:15px;color:#000">
-        <i class="fas fa-shield-alt" style="margin-right:5px;color:#000"></i> Sem consulta ao SPC/Serasa
-      </p>
-    </div>
+  <main class="container">
+    <section class="content" aria-labelledby="hero-title">
+      <div class="top-badge">
+        <i class="fas fa-shield-alt"></i> Sem consulta ao SPC/Serasa
+      </div>
 
-    <h1 style="font-size:20px;margin-top:20px;">
-      Cartão Mercado Livre com limite pré-aprovado de até R$ 5.000 e zero anuidade!
-    </h1>
+      <h1 id="hero-title" style="font-size:22px; margin:18px 0 6px">
+        Cartão Mercado Livre com limite pré-aprovado de até R$ 5.000 e zero anuidade!
+      </h1>
 
-    <a class="button" style="margin-top:20px;">QUERO SOLICITAR MEU CARTÃO!</a>
+      <a class="button" href="#" id="cta-top">QUERO SOLICITAR MEU CARTÃO!</a>
 
-    <!-- HERO sem imagem -->
-    <section class="hero" aria-label="Prévia do aplicativo">
-      <div class="phone">
-        <div class="screen">
-          <div class="statusbar">
-            <span>09:41</span>
-            <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-          </div>
+      <!-- HERO sem imagem -->
+      <section class="hero" aria-label="Prévia do aplicativo">
+        <div class="wrap">
+          <div class="phone" role="img" aria-label="Prévia do app Mercado Livre Bank">
+            <div class="screen">
+              <div class="statusbar">
+                <span>09:41</span>
+                <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+              </div>
 
-          <div class="app-card">
-            <div class="app-head">
-              <div class="brand"><span class="b1">Mercado</span><span class="b2">Livre</span></div>
-              <span class="badge">BANK</span>
+              <div class="app-card">
+                <div class="app-head">
+                  <div class="brand"><span class="b1">Mercado</span><span class="b2">Livre</span></div>
+                  <span class="badge">BANK</span>
+                </div>
+
+                <div class="limit">Limite pré-aprovado até R$ 5.000</div>
+
+                <div class="feature">
+                  <div class="item">Zero anuidade</div>
+                  <div class="item">Cashback 5%</div>
+                  <div class="item">Aprovação rápida</div>
+                  <div class="item">Cartão virtual</div>
+                </div>
+              </div>
+
+              <div class="cta">
+                QUERO SOLICITAR MEU CARTÃO
+                <small>processo 100% digital</small>
+              </div>
             </div>
-
-            <div class="limit">Limite pré-aprovado até R$ 5.000</div>
-
-            <div class="feature">
-              <div class="item">Zero anuidade</div>
-              <div class="item">Cashback 5%</div>
-              <div class="item">Aprovação rápida</div>
-              <div class="item">Cartão virtual</div>
-            </div>
           </div>
 
-          <div class="cta">
-            QUERO SOLICITAR MEU CARTÃO
-            <small>processo 100% digital</small>
-          </div>
+          <p class="hero-note">Processo 100% digital, sem burocracia e sem precisar sair de casa.</p>
         </div>
-      </div>
+      </section>
 
-      <div class="hero-note">
-        Processo 100% digital, sem burocracia e sem precisar sair de casa.
-      </div>
+      <section aria-labelledby="beneficios" class="container-small">
+        <h2 id="beneficios" class="section-title">Benefícios Exclusivos</h2>
+        <div class="benefits-section">
+          <div class="benefit-item"><h3><i class="fas fa-shield-alt"></i> Site Seguro</h3></div>
+          <div class="benefit-item"><h3><i class="fas fa-lock"></i> Dados Protegidos</h3></div>
+          <div class="benefit-item" style="margin-bottom:0"><h3><i class="fas fa-thumbs-up"></i> Aprovação Garantida</h3></div>
+        </div>
+      </section>
+
+      <a class="button" href="#" id="cta-bottom">QUERO SOLICITAR MEU CARTÃO!</a>
     </section>
 
-    <div class="benefits-section" style="background-color:rgba(174,159,0,.15);">
-      <div class="benefits-box">
-        <div class="benefit-item"><h3><i class="fas fa-shield-alt"></i> Site Seguro</h3></div>
-        <div class="benefit-item"><h3><i class="fas fa-lock"></i> Dados Protegidos</h3></div>
-        <div class="benefit-item" style="margin-bottom:0"><h3><i class="fas fa-thumbs-up"></i> Aprovação Garantida</h3></div>
-      </div>
-    </div>
+    <section aria-labelledby="como-funciona" class="container-small" style="background:#fff; border-radius:16px; padding:20px 16px; margin:18px 0">
+      <h2 id="como-funciona" class="section-title" style="margin-top:10px">Como funciona?</h2>
 
-    <a class="button">QUERO SOLICITAR MEU CARTÃO!</a>
-  </div>
-
-  <div style="padding:0 20px;background:#fff;">
-    <div style="margin-top:20px;">
-      <h2 style="font-size:24px;color:#333;margin-bottom:30px;padding-top:40px;">Como funciona?</h2>
-      <div style="display:flex;flex-direction:column;gap:20px;max-width:400px;margin:0 auto;">
-        <div style="background:#f8f9fa;padding:25px 20px 20px;border-radius:10px;text-align:center;position:relative;border:1.5px solid #e9ecef;">
-          <div style="background:#3483fa;color:#fff;width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:absolute;top:-12px;left:50%;transform:translateX(-50%);">1</div>
-          <div style="margin-bottom:10px;"><i class="fas fa-clipboard-list" style="font-size:24px;color:#3483fa;padding-top:10px"></i></div>
-          <h3 style="color:#333;font-size:18px;margin:0 0 5px">Responda o Quiz</h3>
-          <p style="color:#666;font-size:14px;margin:0">Apenas 4 perguntas rápidas para analisarmos seu perfil</p>
+      <div style="display:flex; flex-direction:column; gap:18px; max-width:460px; margin:0 auto;">
+        <div style="background:#f8f9fa; padding:24px 18px; border-radius:12px; text-align:center; position:relative; border:1.5px solid #e9ecef;">
+          <div style="background:var(--ml-blue); color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:absolute; top:-13px; left:50%; transform:translateX(-50%); font-weight:800;">1</div>
+          <div style="margin-bottom:10px;"><i class="fas fa-clipboard-list" style="font-size:22px; color:var(--ml-blue); padding-top:6px"></i></div>
+          <h3 style="color:#333; font-size:18px; margin:0 0 5px">Responda o Quiz</h3>
+          <p style="color:#666; font-size:14px; margin:0">Apenas 4 perguntas rápidas para analisarmos seu perfil</p>
         </div>
 
-        <div style="margin-top:20px;background:#f8f9fa;padding:25px 20px 20px;border-radius:10px;text-align:center;position:relative;border:1.5px solid #e9ecef;">
-          <div style="background:#3483fa;color:#fff;width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:absolute;top:-12px;left:50%;transform:translateX(-50%);">2</div>
-          <div style="margin-bottom:10px;"><i class="fas fa-bolt" style="font-size:24px;color:#3483fa;padding-top:10px"></i></div>
-          <h3 style="color:#333;font-size:18px;margin:0 0 5px">Análise Instantânea</h3>
-          <p style="color:#666;font-size:14px;margin:0">Resultado em segundos, sem consulta ao SPC/Serasa</p>
+        <div style="background:#f8f9fa; padding:24px 18px; border-radius:12px; text-align:center; position:relative; border:1.5px solid #e9ecef;">
+          <div style="background:var(--ml-blue); color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:absolute; top:-13px; left:50%; transform:translateX(-50%); font-weight:800;">2</div>
+          <div style="margin-bottom:10px;"><i class="fas fa-bolt" style="font-size:22px; color:var(--ml-blue); padding-top:6px"></i></div>
+          <h3 style="color:#333; font-size:18px; margin:0 0 5px">Análise Instantânea</h3>
+          <p style="color:#666; font-size:14px; margin:0">Resultado em segundos, sem consulta ao SPC/Serasa</p>
         </div>
 
-        <div style="margin-top:20px;background:#f8f9fa;padding:25px 20px 20px;border-radius:10px;text-align:center;position:relative;border:1.5px solid #e9ecef;">
-          <div style="background:#3483fa;color:#fff;width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:absolute;top:-12px;left:50%;transform:translateX(-50%);">3</div>
-          <div style="margin-bottom:10px;"><i class="fas fa-credit-card" style="font-size:24px;color:#3483fa;padding-top:10px"></i></div>
-          <h3 style="color:#333;font-size:18px;margin:0 0 5px">Receba seu Cartão</h3>
-          <p style="color:#666;font-size:14px;margin:0">Cartão virtual na hora e físico em até 7 dias úteis</p>
+        <div style="background:#f8f9fa; padding:24px 18px; border-radius:12px; text-align:center; position:relative; border:1.5px solid #e9ecef;">
+          <div style="background:var(--ml-blue); color:#fff; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; position:absolute; top:-13px; left:50%; transform:translateX(-50%); font-weight:800;">3</div>
+          <div style="margin-bottom:10px;"><i class="fas fa-credit-card" style="font-size:22px; color:var(--ml-blue); padding-top:6px"></i></div>
+          <h3 style="color:#333; font-size:18px; margin:0 0 5px">Receba seu Cartão</h3>
+          <p style="color:#666; font-size:14px; margin:0">Cartão virtual na hora e físico em até 7 dias úteis</p>
         </div>
       </div>
 
-      <a class="button" style="background:#3483fa;color:#fff;animation:pulse 2s infinite;">QUERO SOLICITAR MEU CARTÃO!</a>
+      <a class="button" href="#" style="margin:26px auto 6px">QUERO SOLICITAR MEU CARTÃO!</a>
+    </section>
 
-      <div style="padding-top:30px;"></div>
-    </div>
-  </div>
-
-  <div style="padding:0 20px;background:#fff159;">
-    <div style="margin-top:20px;">
-      <h2 style="font-size:24px;color:#333;margin-bottom:30px;padding-top:40px;">Benefícios Exclusivos</h2>
-      <div style="display:flex;flex-direction:column;gap:20px;max-width:400px;margin:0 auto;">
-        <div style="background:#fff;padding:25px 20px 20px;border-radius:10px;text-align:center;position:relative;border:2px solid #3483fa;">
-          <div style="margin-bottom:10px;"><i class="fas fa-dollar-sign" style="font-size:24px;color:#3483fa;padding-top:10px"></i></div>
-          <h3 style="color:#3483fa;font-size:18px;margin:0 0 5px">Zero Anuidade</h3>
-          <p style="color:#666;font-size:14px;margin:0">Economize mais de R$ 500 por ano em anuidades</p>
-        </div>
-
-        <div style="background:#fff;padding:25px 20px 20px;border-radius:10px;text-align:center;position:relative;border:2px solid #3483fa;">
-          <div style="margin-bottom:10px;"><i class="fas fa-chart-line" style="font-size:24px;color:#3483fa;padding-top:10px"></i></div>
-          <h3 style="color:#3483fa;font-size:18px;margin:0 0 5px">Limite Flexível</h3>
-          <p style="color:#666;font-size:14px;margin:0">Aumente seu limite conforme usa o cartão</p>
-        </div>
-
-        <div style="background:#fff;padding:25px 20px 20px;border-radius:10px;text-align:center;position:relative;border:2px solid #3483fa;">
-          <div style="margin-bottom:10px;"><i class="fas fa-undo" style="font-size:24px;color:#3483fa;padding-top:10px"></i></div>
-          <h3 style="color:#3483fa;font-size:18px;margin:0 0 5px">Cashback Garantido</h3>
-          <p style="color:#666;font-size:14px;margin:0">Receba até 5% de volta em todas as suas compras</p>
-        </div>
-
-        <div style="background:#fff;padding:25px 20px 20px;border-radius:10px;text-align:center;position:relative;border:2px solid #3483fa;">
-          <div style="margin-bottom:10px;"><i class="fas fa-gift" style="font-size:24px;color:#3483fa;padding-top:10px"></i></div>
-          <h3 style="color:#3483fa;font-size:18px;margin:0 0 5px">Benefícios Exclusivos</h3>
-          <p style="color:#666;font-size:14px;margin:0">Descontos especiais em lojas parceiras</p>
-        </div>
+    <footer style="padding:12px 15px; text-align:center; margin:24px 0 26px; background:#f9f9f9; border:1px solid #eaeaea; border-radius:14px">
+      <div style="max-width:660px; margin:0 auto;">
+        <p style="color:#777; font-size:10px; margin:6px 0; line-height:1.35;">Mercado Livre Brasil LTDA | CNPJ: 79.379.491.0008-50</p>
+        <p style="color:#777; font-size:10px; margin:6px 0; line-height:1.35;">Av. das Nações Unidas, 3000 - Bonfim, Osasco - SP, 06233-903</p>
+        <p style="color:#999; font-size:9px; margin:6px 0;">© 2025 - Todos os direitos reservados</p>
       </div>
-
-      <a class="button" style="background:#3483fa;color:#fff;margin-top:30px;margin-bottom:40px;">QUERO SOLICITAR MEU CARTÃO!</a>
-    </div>
-  </div>
-
-  <footer style="padding:10px 15px;text-align:center;margin-top:50px;background:#f9f9f9;border-top:1px solid #eaeaea;font-family:'Sora',sans-serif;">
-    <div style="max-width:600px;margin:0 auto;">
-      <p style="color:#777;font-size:10px;margin-bottom:5px;line-height:1.2;">Mercado Livre Brasil LTDA | CNPJ: 79.379.491.0008-50</p>
-      <p style="color:#777;font-size:10px;margin-bottom:5px;line-height:1.2;">Av. das Nações Unidas, 3000 - Bonfim, Osasco - SP, 06233-903</p>
-      <p style="color:#999;font-size:9px;margin-top:5px;">© 2025 - Todos os direitos reservados</p>
-    </div>
-  </footer>
+    </footer>
+  </main>
 
   <script>
     // Mantém UTMs entre as páginas
     function getUrlParams(){ const params={}; const urlParams=new URLSearchParams(window.location.search); for(const [k,v] of urlParams){ params[k]=v } return params }
     function buildUrlWithParams(baseUrl){ const params=getUrlParams(); const url=new URL(baseUrl, window.location.href); Object.keys(params).forEach(k=>url.searchParams.append(k, params[k])); return url.toString() }
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.querySelectorAll('.button').forEach(btn=>{
-        btn.addEventListener('click', e=>{
-          e.preventDefault();
-          window.location.href = buildUrlWithParams('../2/index.html');
-        });
-      });
-    });
+    function wireCtas(){
+      const go = (e)=>{ e.preventDefault(); window.location.href = buildUrlWithParams('../2/index.html') }
+      document.querySelectorAll('#cta-top, #cta-bottom').forEach(el=>el.addEventListener('click', go));
+      // qualquer .button fora dos IDs também navega:
+      document.querySelectorAll('.button:not(#cta-top):not(#cta-bottom)').forEach(el=>el.addEventListener('click', go));
+    }
+    function stickyShadow(){
+      const h=document.getElementById('site-header');
+      const onScroll=()=>{ (window.scrollY>12)? h.classList.add('is-scrolled') : h.classList.remove('is-scrolled') }
+      onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+    }
+    document.addEventListener('DOMContentLoaded', ()=>{ wireCtas(); stickyShadow(); });
   </script>
 </body>
 </html>
